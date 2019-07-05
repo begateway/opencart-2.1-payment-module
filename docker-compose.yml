@@ -1,0 +1,37 @@
+version: '3.2'
+services:
+  mysql:
+    image: mysql:5.5
+    container_name: mysql
+    hostname: mysql
+    environment:
+      - MYSQL_DATABASE=opencart
+      - MYSQL_ROOT_PASSWORD=opencart
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  opencart:
+    build: ./docker/
+    container_name: opencart
+    hostname: opencart
+    restart: always
+    ports:
+      - '8080:80'
+      - '8443:443'
+    volumes:
+      - ./upload/catalog/language/russian/payment/begateway.php:/var/www/html/catalog/language/russian/payment/begateway.php
+      - ./upload/catalog/language/english/payment/begateway.php:/var/www/html/catalog/language/english/payment/begateway.php
+      - ./upload/catalog/controller/payment/begateway.php:/var/www/html/catalog/controller/payment/begateway.php
+      - ./upload/catalog/model/payment/begateway.php:/var/www/html/catalog/model/payment/begateway.php
+      - ./upload/catalog/view/theme/default/template/payment/begateway.tpl:/var/www/html/catalog/view/theme/default/template/payment/begateway.tpl
+      - ./upload/admin/language/russian/payment/begateway.php:/var/www/html/admin/language/russian/payment/begateway.php
+      - ./upload/admin/language/english/payment/begateway.php:/var/www/html/admin/language/english/payment/begateway.php
+      - ./upload/admin/controller/payment/begateway.php:/var/www/html/admin/controller/payment/begateway.php
+      - ./upload/admin/view/template/payment/begateway.tpl:/var/www/html/admin/view/template/payment/begateway.tpl
+      - ./upload/admin/view/image/payment/begateway.png:/var/www/html/admin/view/image/payment/begateway.png
+    depends_on:
+      - mysql
+volumes:
+  mysql_data:
+    driver: local
