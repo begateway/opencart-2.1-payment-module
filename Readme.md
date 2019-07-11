@@ -12,6 +12,7 @@
   * Shop secret key
   * Payment gateway domain
   * Payment page domain
+  * Enable supported payment methods
   * Order statuses for successfuly processed payment and for failed one
   * Enable the module
   * Module mode
@@ -71,6 +72,7 @@ Issue pull requests or send feature requests or open [a new issue]( https://gith
   * Ключ магазина
   * Домен платежного шлюза
   * Домен страницы оплаты
+  * Включите поддерживаемые способы оплаты
   * Статусы заказа в случае успешной и не успешной оплаты
   * Включите модуль
   * Установите режим работы модуля
