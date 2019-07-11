@@ -1,4 +1,6 @@
 <?php
+require_once DIR_APPLICATION . 'model/payment/begateway.php';
+
 class ControllerPaymentBegateway extends Controller {
   const API_VERSION = 2.1;
 
@@ -58,16 +60,24 @@ class ControllerPaymentBegateway extends Controller {
       'tracking_id' => $order_info['order_id']);
 
     $callback_url = $this->url->link('payment/begateway/callback1', '', 'SSL');
-    $callback_url = str_replace('carts.local', 'webhook.begateway.com:8443', $callback_url);
+    $callback_url = str_replace('127.0.0.1:8080', 'webhook.begateway.com:8443', $callback_url);
 
     $setting_array = array ( 'success_url'=>$this->url->link('payment/begateway/callback', '', 'SSL'),
       'decline_url'=> $this->url->link('checkout/checkout', '', 'SSL'),
       'cancel_url'=> $this->url->link('checkout/checkout', '', 'SSL'),
       'fail_url'=>$this->url->link('checkout/checkout', '', 'SSL'),
-      'language' => $this->_language($this->session->data['language']),
+      'language' => $this->session->data['language'],
       'notification_url'=> $callback_url);
 
     $transaction_type='payment';
+
+    $payment_methods_array = array();
+
+    foreach (ModelPaymentBegateway::getPaymentMethods() as $pm) {
+      if ((int)$this->config->get("begateway_payment_method_${pm}") == 1) {
+        $payment_methods_array []= $pm;
+      }
+    }
 
     $checkout_array = array(
       'version' => self::API_VERSION,
@@ -77,6 +87,10 @@ class ControllerPaymentBegateway extends Controller {
       'customer' => $customer_array,
       'test' => (int)$this->config->get('begateway_test_mode') == 1
       );
+
+    if (!empty($payment_methods_array)) {
+      $checkout_array['payment_method']['types'] = $payment_methods_array;
+    }
 
     $token_json =  array('checkout' =>$checkout_array );
 
@@ -174,6 +188,16 @@ class ControllerPaymentBegateway extends Controller {
       $three_d = '3-D Secure: ' . $three_d . '.';
     }
 
+    $payment_method = 'n/a';
+
+    if (isset($post_array['transaction']['method_type'])) {
+      $payment_method = $post_array['transaction']['method_type'];
+    }
+
+    if (isset($post_array['transaction']['payment_method_type'])) {
+      $payment_method = $post_array['transaction']['payment_method_type'];
+    }
+
     $this->log->write("Webhook received: $postData");
 
     $this->load->model('checkout/order');
@@ -184,23 +208,13 @@ class ControllerPaymentBegateway extends Controller {
       $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));
 
       if(isset($status) && $status == 'successful'){
-        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('begateway_completed_status_id'), "UID: $transaction_id. $three_d Processor message: $transaction_message", true);
+        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('begateway_completed_status_id'), "UID: $transaction_id. Payment method: $payment_method. $three_d Processor message: $transaction_message", true);
         die('Changed to successful');
       }
       if(isset($status) && ($status == 'failed')){
         $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('begateway_failed_status_id'), "UID: $transaction_id. Fail reason: $transaction_message", true);
         die('Changed to failed');
       }
-    }
-  }
-
-  private function _language($lang_id) {
-    $languages = array('en','ru','es','fr','it','zh','de','tr','da','sv','no','fi','pl','ja','be');
-
-    if (in_array($lang_id, $languages)) {
-      return $lang_id;
-    } else {
-      return 'en';
     }
   }
 

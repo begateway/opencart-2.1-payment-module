@@ -1,4 +1,6 @@
 <?php
+require_once DIR_CATALOG . 'model/payment/begateway.php';
+
 class ControllerPaymentBegateway extends Controller {
   private $error = array();
 
@@ -49,6 +51,12 @@ class ControllerPaymentBegateway extends Controller {
     $data['entry_transaction_type_authorization'] = $this->language->get('entry_transaction_type_authorization');
     $data['entry_transaction_type_payment'] = $this->language->get('entry_transaction_type_payment');
     $data['entry_test_mode'] = $this->language->get('entry_test_mode');
+
+    $data["begateway_payment_methods"] = ModelPaymentBegateway::getPaymentMethods();
+
+    foreach ($data["begateway_payment_methods"] as $pm) {
+      $data["entry_payment_method_{$pm}_text"] = $this->language->get("entry_payment_method_${pm}_text");
+    }
 
     $data['button_save'] = $this->language->get('button_save');
     $data['button_cancel'] = $this->language->get('button_cancel');
@@ -114,25 +122,54 @@ class ControllerPaymentBegateway extends Controller {
     if (isset($this->request->post['begateway_companyid'])) {
       $data['begateway_companyid'] = $this->request->post['begateway_companyid'];
     } else {
-      $data['begateway_companyid'] = $this->config->get('begateway_companyid');
+      $shop_id = $this->config->get('begateway_companyid');
+      if (!isset($shop_id) || empty($shop_id)) {
+        $shop_id = ModelPaymentBegateway::DEMO_SHOP_ID;
+      }
+      $data['begateway_companyid'] = $shop_id;
     }
 
     if (isset($this->request->post['begateway_encryptionkey'])) {
       $data['begateway_encryptionkey'] = $this->request->post['begateway_encryptionkey'];
     } else {
-      $data['begateway_encryptionkey'] = $this->config->get('begateway_encryptionkey');
+      $shop_key = $this->config->get('begateway_encryptionkey');
+      if (!isset($shop_key) || empty($shop_key)) {
+        $shop_key = ModelPaymentBegateway::DEMO_SHOP_KEY;
+      }
+      $data['begateway_encryptionkey'] = $shop_key;
     }
 
     if (isset($this->request->post['begateway_domain_payment_gateway'])) {
       $data['begateway_domain_payment_gateway'] = $this->request->post['begateway_domain_payment_gateway'];
     } else {
-      $data['begateway_domain_payment_gateway'] = $this->config->get('begateway_domain_payment_gateway');
+      $gateway_url = $this->config->get('begateway_domain_payment_gateway');
+      if (!isset($gateway_url) || empty($gateway_url)) {
+        $gateway_url = ModelPaymentBegateway::DEMO_GATEWAY_URL;
+      }
+      $data['begateway_domain_payment_gateway'] = $gateway_url;
     }
 
     if (isset($this->request->post['begateway_domain_payment_page'])) {
       $data['begateway_domain_payment_page'] = $this->request->post['begateway_domain_payment_page'];
     } else {
-      $data['begateway_domain_payment_page'] = $this->config->get('begateway_domain_payment_page');
+      $checkout_url = $this->config->get('begateway_domain_payment_page');
+      if (!isset($checkout_url) || empty($checkout_url)) {
+        $checkout_url = ModelPaymentBegateway::DEMO_CHECKOUT_URL;
+      }
+      $data['begateway_domain_payment_page'] = $checkout_url;
+    }
+
+
+    foreach ($data["begateway_payment_methods"] as $pm) {
+      if (isset($this->request->post["begateway_payment_method_${pm}"])) {
+        $data["begateway_payment_method_${pm}"] = $this->request->post["begateway_payment_method_${pm}"];
+      } else {
+        $pm_default = $this->config->get("begateway_payment_method_${pm}");
+        if (!isset($pm_default) || empty($pm_default)) {
+          $pm_default = '0';
+        }
+        $data["begateway_payment_method_${pm}"] = $pm_default;
+      }
     }
 
     if (isset($this->request->post['begateway_completed_status_id'])) {
@@ -160,7 +197,11 @@ class ControllerPaymentBegateway extends Controller {
     if (isset($this->request->post['begateway_test_mode'])) {
       $data['begateway_test_mode'] = $this->request->post['begateway_test_mode'];
     } else {
-      $data['begateway_test_mode'] = $this->config->get('begateway_test_mode');
+      $test = $this->config->get('begateway_test_mode');
+      if (!isset($test) || empty($test)) {
+        $test = 1;
+      }
+      $data['begateway_test_mode'] = $test;
     }
 
     if (isset($this->request->post['begateway_geo_zone_id'])) {

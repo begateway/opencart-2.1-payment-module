@@ -61,6 +61,27 @@
               <?php } ?>
             </div>
           </div>
+
+          <?php foreach ($data["begateway_payment_methods"] as $pm) { ?>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" for="input-payment-method-<?php echo $pm; ?>"><?php echo $data["entry_payment_method_${pm}_text"]; ?></label>
+              <div class="col-sm-10">
+                <select name="begateway_payment_method_<?php echo $pm; ?>" id="input-payment-method-<?php echo $pm; ?>" class="form-control">
+                  <?php $enabled_selected = '';
+                        $disabled_selected = '';
+                        if ($data["begateway_payment_method_${pm}"]) {
+                          $enabled_selected = 'selected';
+                        } else {
+                          $disabled_selected = 'selected';
+                        }
+                  ?>
+                  <option value="1" <?php echo $enabled_selected; ?> ><?php echo $text_enabled; ?></option>
+                  <option value="0" <?php echo $disabled_selected; ?> ><?php echo $text_disabled; ?></option>
+                </select>
+              </div>
+            </div>
+          <?php } ?>
+
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-order-status"><?php echo $entry_order_status_completed_text; ?></label>
             <div class="col-sm-10">

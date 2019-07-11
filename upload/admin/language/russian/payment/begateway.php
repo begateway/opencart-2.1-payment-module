@@ -33,9 +33,12 @@ $_['entry_domain_payment_gateway_help'] = 'Домен платежного шл�
 $_['entry_domain_payment_page']      = 'Домен страницы оплаты';
 $_['entry_domain_payment_page_help'] = 'Домен страницы оплаты, полученный от вашей платежной компании';
 $_['entry_transaction_type_text']          = 'Тип транзакции';
-$_['entry_transaction_type_authorization'] = 'Пре-авторизация';
+$_['entry_transaction_type_authorization'] = 'Авторизация';
 $_['entry_transaction_type_payment'] = 'Оплата';
 $_['entry_test_mode'] = 'Режим работы';
+$_['entry_payment_method_credit_card_text'] = 'Оплата банковскими картами';
+$_['entry_payment_method_halva_text'] = 'Оплата картой Халва';
+$_['entry_payment_method_erip_text'] = 'Оплата через ЕРИП';
 
 // Error
 $_['error_permission']      = 'Внимание: У вас нет прав для изменения настроек модуля оплаты!';
