@@ -33,9 +33,12 @@ $_['entry_domain_payment_gateway_help'] = 'Payment gateway domain received from 
 $_['entry_domain_payment_page']      = 'Payment page domain';
 $_['entry_domain_payment_page_help'] = 'Payment page domain received from your payment processor e.g. checkout.processor.com';
 $_['entry_transaction_type_text']          = 'Transaction type';
-$_['entry_transaction_type_authorization'] = 'authorization';
-$_['entry_transaction_type_payment'] = 'payment';
+$_['entry_transaction_type_authorization'] = 'Authorization';
+$_['entry_transaction_type_payment'] = 'Payment';
 $_['entry_test_mode'] = 'Module mode';
+$_['entry_payment_method_credit_card_text'] = 'Credit card payments';
+$_['entry_payment_method_halva_text'] = 'Halva payments';
+$_['entry_payment_method_erip_text'] = 'ERIP payments';
 
 // Error
 $_['error_permission']      = 'Warning: You do not have permission to modify the payment module!';

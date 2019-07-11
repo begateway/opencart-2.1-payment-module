@@ -1,5 +1,16 @@
 <?php
 class ModelPaymentBegateway extends Model {
+
+  const DEMO_SHOP_ID  = '361';
+  const DEMO_SHOP_KEY = 'b8647b68898b084b836474ed8d61ffe117c9a01168d867f24953b776ddcb134d';
+
+  const DEMO_GATEWAY_URL  = 'demo-gateway.begateway.com';
+  const DEMO_CHECKOUT_URL = 'checkout.begateway.com';
+
+  static function getPaymentMethods() {
+    return array('credit_card', 'halva', 'erip');
+  }
+
   public function getMethod($address, $total) {
     $this->load->language('payment/begateway');
 
